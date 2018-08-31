@@ -52,20 +52,29 @@ Scope.prototype.$watch = function(watchFn, listenerFn) {
 //  watch函数的数据发生变化后，调用listener函数，叫做脏检查 (dirty-checking)
 //  当调用 $digest时，所有的watch都被调用，因为控制watch数量，优化性能
 
-Scope.prototype.$digest = function() {
+Scope.prototype.$$digestOnce = function() {
   var self = this;
-  var newValue, oldValue;
+  var newValue, oldValue, dirty;
   _.forEach(this.$$watchers, function(watcher) {
     newValue = watcher.watchFn(self);
     oldValue = watcher.last;
     if (newValue !== oldValue) {
       watcher.last = newValue;
       watcher.listenerFn(newValue,
-        // judge the oldValue and replace it with newValue if it is the init function
         (oldValue === initWatchVal ? newValue : oldValue),
         self);
+      dirty = true;
     }
   });
+  return dirty;
 };
+
+Scope.prototype.$digest = function() {
+  var dirty;
+  do {
+    dirty = this.$$digestOnce();
+  } while (dirty);
+};
+
 
 module.exports = Scope;

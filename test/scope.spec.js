@@ -80,6 +80,82 @@ describe("digest", function(){
   });
 
 
+  it("triggers chained watchers in the same digest", function() {
+    /**
+     * @description
+     * scope = new Scope()
+     * // $$watcher as array in this;
+     */
+    scope.name = 'Jane';
+
+
+    // watcher1 push a watcher in the arrayList
+    scope.$watch(
+      function(scope) {
+        return scope.nameUpper; //undefined
+      },
+      function(newValue, oldValue, scope) {
+        if (newValue) {
+          scope.initial = newValue.substring(0, 1) + '.';
+        }
+      }
+    );
+
+
+    // watcher2 push a watcher in the arrayList
+    scope.$watch(
+      function(scope) {
+        return scope.name;
+      },
+      function(newValue, oldValue, scope) {
+        if (newValue) {
+          scope.nameUpper = newValue.toUpperCase();
+        }
+      }
+    );
+
+
+
+
+    // the scope has 2 watcher in array-list
+    scope.$digest();
+    // invoke the $digest
+    // iterate the list
+
+    /**
+     * for the watcher1
+     * newValue = watchFn = scope.nameUpper = undefined;
+     * oldValue = watcher1.last = initFn;
+     * newValue not equal newValue
+     * watcher1.last = undefined
+     * listenerFn(undefined, undefined,self)
+     *
+     *
+     *
+     */
+
+
+
+
+    expect(scope.initial).to.equal('J.');
+    scope.name = 'Bob';
+    scope.$digest();
+    expect(scope.initial).to.equal('B.');
+
+    /**
+     * if change the order of the registered watcher , the test will pass
+     * then realize this
+     * this digest is running until there is no watched values changed
+     *
+     *
+     *
+     */
+
+
+
+  });
+
+
 })
 
 
