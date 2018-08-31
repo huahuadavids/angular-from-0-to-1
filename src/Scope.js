@@ -53,9 +53,8 @@ Scope.prototype.$watch = function(watchFn, listenerFn) {
 //  当调用 $digest时，所有的watch都被调用，因为控制watch数量，优化性能
 
 Scope.prototype.$$digestOnce = function() {
-  console.log("digest once")
   var self = this;
-  var newValue, oldValue, dirty;
+  var newValue, oldValue, dirty = false;
   _.forEach(this.$$watchers, function(watcher) {
     newValue = watcher.watchFn(self);
     oldValue = watcher.last;
@@ -71,9 +70,13 @@ Scope.prototype.$$digestOnce = function() {
 };
 
 Scope.prototype.$digest = function() {
+  var ttl = 10;  // This maximum amount of iterations is called the TTL (short for “Time To Live”)
   var dirty;
   do {
     dirty = this.$$digestOnce();
+    if (dirty && !(ttl--)) {
+      throw "10 digest iterations reached";
+    }
   } while (dirty);
 };
 
