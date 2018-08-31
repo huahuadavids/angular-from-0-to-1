@@ -34,48 +34,48 @@ describe("digest", function(){
   */
 
   it("step 03: calls the listener function when the watched value changes", function() {
-    scope.someValue = 'a';
-    scope.counter = 0;
-    scope.$watch(
-      function(scope) {
-        return scope.someValue;
-      },
-      function(newValue, oldValue, scope) {
-        scope.counter++;
-      }
-    );
+    // scope.someValue = 'a';
+    // scope.counter = 0;
+    // scope.$watch(
+    //   function(scope) {
+    //     return scope.someValue;
+    //   },
+    //   function(newValue, oldValue, scope) {
+    //     scope.counter++;
+    //   }
+    // );
 
     // int counter === 0
-    expect(scope.counter).to.equal(0);
+    //expect(scope.counter).to.equal(0);
 
     // invoke $digest counter === 1
-    scope.$digest();
-    expect(scope.counter).to.equal(1);
+   // scope.$digest();
+   // expect(scope.counter).to.equal(1);
 
     // invoke $digest but someValue not changed $digest counter === 1
-    scope.$digest();
-    expect(scope.counter).to.equal(1);
+  //  scope.$digest();
+   // expect(scope.counter).to.equal(1);
 
     // change the someValue
-    scope.someValue = 'b';
-    // no invoke the $digest counter === 1
-    expect(scope.counter).to.equal(1);
+   // scope.someValue = 'b';
+   // // no invoke the $digest counter === 1
+    //expect(scope.counter).to.equal(1);
 
 
-    scope.$digest();
+   // scope.$digest();
     //  invoke the $digest counter === 2
-    expect(scope.counter).to.equal(2);
+  //  expect(scope.counter).to.equal(2);
 
   });
 
 
   // there is no listenFn
   it("may have watchers that omit the listener function", function() {
-    var watchFn = function(){
-      return "huahuadavids"
-    }
-    scope.$watch(watchFn);
-    scope.$digest();
+    // var watchFn = function(){
+    //   return "huahuadavids"
+    // }
+   // scope.$watch(watchFn);
+   // scope.$digest();
 
   });
 
@@ -100,8 +100,6 @@ describe("digest", function(){
         }
       }
     );
-
-
     // watcher2 push a watcher in the arrayList
     scope.$watch(
       function(scope) {
@@ -114,7 +112,36 @@ describe("digest", function(){
       }
     );
 
-
+    /**
+     * loop 1
+     * watcher1
+     *
+     * {
+     *    last: undefined
+     * }
+     * dirty = true;
+     * watch 2
+     *
+     * {
+     *    last: 'Jane'
+     * }
+     * dirty = true;
+     * scope.nameUpper = 'JANE'
+     *
+     *  loop 2
+     *  watch1
+     *  {
+     *    last: 'JANE'
+     *  }
+     *  scope.initial = J.
+     *  dirty = true;
+     *
+     *   dirty = undefined;
+     *   loop 3
+     *   dirty = undefined;
+     *   dirty = undefined;
+     *   end loop
+     */
 
 
     // the scope has 2 watcher in array-list

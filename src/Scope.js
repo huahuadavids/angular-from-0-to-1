@@ -53,6 +53,7 @@ Scope.prototype.$watch = function(watchFn, listenerFn) {
 //  当调用 $digest时，所有的watch都被调用，因为控制watch数量，优化性能
 
 Scope.prototype.$$digestOnce = function() {
+  console.log("digest once")
   var self = this;
   var newValue, oldValue, dirty;
   _.forEach(this.$$watchers, function(watcher) {
