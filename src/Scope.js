@@ -23,6 +23,9 @@ function Scope(){
   // store all the registered watchers
   this.$$watchers = [];
 
+  // digest loop if have a dirty watcher just return it ,stop the $digest
+  this.$$lastDirtyWatch = null;
+
 }
 
 // init the last value , because it is not equal to others except it self
@@ -30,8 +33,6 @@ function initWatchVal() { }
 
 Scope.prototype.$watch = function(watchFn, listenerFn) {
   var watcher = {
-
-
     // if this function return nothing
     // that will in $digest undefined !== last
     watchFn: watchFn,
@@ -47,6 +48,7 @@ Scope.prototype.$watch = function(watchFn, listenerFn) {
     last: initWatchVal
   };
   this.$$watchers.push(watcher);
+  this.$$lastDirtyWatch = null;
 };
 
 //  watch函数的数据发生变化后，调用listener函数，叫做脏检查 (dirty-checking)
@@ -54,16 +56,18 @@ Scope.prototype.$watch = function(watchFn, listenerFn) {
 
 Scope.prototype.$$digestOnce = function() {
   var self = this;
-  var newValue, oldValue, dirty = false;
+  var newValue, oldValue, dirty;
   _.forEach(this.$$watchers, function(watcher) {
     newValue = watcher.watchFn(self);
     oldValue = watcher.last;
     if (newValue !== oldValue) {
+      self.$$lastDirtyWatch = watcher;
       watcher.last = newValue;
-      watcher.listenerFn(newValue,
-        (oldValue === initWatchVal ? newValue : oldValue),
-        self);
+      watcher.listenerFn(newValue, (oldValue === initWatchVal ? newValue : oldValue), self);
       dirty = true;
+    } else if (self.$$lastDirtyWatch === watcher) {
+      // lodash exit the loop
+      return false;
     }
   });
   return dirty;
@@ -72,6 +76,7 @@ Scope.prototype.$$digestOnce = function() {
 Scope.prototype.$digest = function() {
   var ttl = 10;  // This maximum amount of iterations is called the TTL (short for “Time To Live”)
   var dirty;
+  this.$$lastDirtyWatch = null;
   do {
     dirty = this.$$digestOnce();
     if (dirty && !(ttl--)) {
