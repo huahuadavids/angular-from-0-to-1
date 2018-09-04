@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>snakes</title>
+</head>
+<body>
+<style>
+  * {
+    padding: 0;
+    margin: 0;
+  }
+
+  #app {
+    width: 800px;
+    height: 600px;
+    background: #249e5b;
+    position: relative;
+  }
+
+  #app .food {
+    position: absolute;
+  }
+</style>
+
+
+<div id="app">
+
+
+</div>
+
+<script>
+  (function (doc, win) {
+
+    var FOODS      = [], // store all the food
+        MAP_WIDTH  = 800,
+        MAP_HEIGHT = 600;
+
+    function Food (options) {
+      this.color = options.color || "#ccc";
+      this.x = options.x || 0;
+      this.y = options.y || 0;
+      this.width = options.width || 20;
+      this.height = options.height || 20;
+    }
+
+    function remove () {
+      for (var i = 0; i < FOODS.length; i++) {
+        var ele = FOODS[ i ]
+        ele.parentNode.removeChild(ele)
+        FOODS.splice(i, 1)
+      }
+    }
+
+    // show the food in the map
+    Food.prototype.init = function (map) {
+      remove()
+      var food = doc.createElement("div");
+      food.className = "food";
+
+      // set the style for the food
+      food.style.width = this.width + "px";
+      food.style.height = this.height + "px";
+      food.style.backgroundColor = this.color;
+
+      this.x = parseInt(Math.random() * MAP_WIDTH / this.width) * this.width;
+      this.y = parseInt(Math.random() * MAP_HEIGHT / this.height) * this.height;
+
+      food.style.left = this.x + "px";
+      food.style.top = this.y + "px";
+      // append to the map
+      map.appendChild(food);
+      FOODS.push(food);
+    };
+    win.Food = Food;
+  }(document, window));
+
+
+  (function (doc, win) {
+
+      function Snake(){
+
+      }
+
+  }(document, window));
+
+
+  var app = document.querySelector("#app")
+  var f = new Food({})
+  f.init(app)
+  f.init(app)
+
+
+</script>
+
+</body>
+</html>

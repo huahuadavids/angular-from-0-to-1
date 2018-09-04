@@ -1,7 +1,7 @@
 const gulp = require('gulp');
 const mocha = require('gulp-mocha');
 const mocha_options = {
-  reporter: 'List', // nyan,Spec,List
+  reporter: 'Spec', // nyan,Spec,List
   globals: ["_", "jquery"],
   require: [], //Require custom modules before tests are run
 
