@@ -1,12 +1,12 @@
 
 require('chai/register-expect');
-var Scope = require("../src/Scope")
+var Scope = require("../../src/Scope")
 
 /**
  * @ this condition , the digest runs forever
  */
 // describe is test suite
-describe("digest", function() {
+describe("$Scope", function() {
   var scope;
 
   beforeEach(function () {

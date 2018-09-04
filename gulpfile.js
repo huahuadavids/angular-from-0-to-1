@@ -8,6 +8,6 @@ const mocha_options = {
 };
 gulp.task('default', () =>
   gulp.
-  src('test/*.spec.js', {read: false}).
+  src('test/**/*.spec.js', {read: false}).
   pipe(mocha(mocha_options)).on('error', console.error)
 );

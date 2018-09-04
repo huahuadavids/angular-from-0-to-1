@@ -90,9 +90,22 @@ Scope.prototype.$$digestOnce = function() {
   return dirty;
 };
 
-
+/**
+ * @name $$areEqual
+ * @description compare two args by value or by reference
+ * @param newValue
+ * @param oldValue
+ * @param valueEq
+ * @returns {boolean}
+ */
 Scope.prototype.$$areEqual = function(newValue, oldValue, valueEq) {
-  return _[valueEq?'isEqual':'eq'](newValue, oldValue)
+  if (valueEq) {
+    return _.isEqual(newValue, oldValue);
+  } else {
+    return newValue === oldValue ||
+      (typeof newValue === 'number' && typeof oldValue === 'number' &&
+        isNaN(newValue) && isNaN(oldValue));
+  }
 };
 
 
@@ -108,6 +121,22 @@ Scope.prototype.$digest = function() {
     }
   } while (dirty);
 };
+
+
+/**
+ * @name $eval
+ * @Test test/scope/scope6.spec.js
+ * @type function
+ * @description execute some code in the context of a scope
+ * @param fn
+ * @param args
+ * @returns fn
+ */
+Scope.prototype.$eval = function(fn, args) {
+  return fn(this, args);
+};
+
+
 
 
 module.exports = Scope;

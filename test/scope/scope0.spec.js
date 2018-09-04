@@ -1,7 +1,7 @@
 require('chai/register-expect');
-const Scope = require("../src/Scope");
+const Scope = require("../../src/Scope");
 
-describe("Scope", function () {
+describe("$Scope", function () {
   it("Step01: can be constructed and used as an object", function () {
     var scope = new Scope();
     scope.name = 1;
@@ -12,7 +12,7 @@ describe("Scope", function () {
   });
 });
 
-describe("digest", function () {
+describe("$Scope", function () {
   let scope;
 
   beforeEach(function () {
