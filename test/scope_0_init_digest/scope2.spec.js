@@ -41,7 +41,7 @@ describe("$Scope", function() {
 
     expect(watchExecutions).to.equal(0);      // 0
     scope.$digest();
-    //console.log(scope.$$lastDirtyWatch) // { watchFn: [Function], listenerFn: [Function], last: 99 }
+    //console.log(scope_0_init_digest.$$lastDirtyWatch) // { watchFn: [Function], listenerFn: [Function], last: 99 }
 
     expect(watchExecutions).to.equal(200);
     // it executes 200 times

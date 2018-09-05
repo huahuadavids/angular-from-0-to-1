@@ -28,44 +28,44 @@ describe("$Scope", function () {
    return 1;
    };
    //$watch方法注册两个函数
-   scope.$watch(watchFn, listenerFn);
-   scope.$digest();
+   scope_0_init_digest.$watch(watchFn, listenerFn);
+   scope_0_init_digest.$digest();
 
    });
    */
 
   it("step 03: calls the listener function when the watched value changes", function () {
-    // scope.someValue = 'a';
-    // scope.counter = 0;
-    // scope.$watch(
-    //   function(scope) {
-    //     return scope.someValue;
+    // scope_0_init_digest.someValue = 'a';
+    // scope_0_init_digest.counter = 0;
+    // scope_0_init_digest.$watch(
+    //   function(scope_0_init_digest) {
+    //     return scope_0_init_digest.someValue;
     //   },
-    //   function(newValue, oldValue, scope) {
-    //     scope.counter++;
+    //   function(newValue, oldValue, scope_0_init_digest) {
+    //     scope_0_init_digest.counter++;
     //   }
     // );
 
     // int counter === 0
-    //expect(scope.counter).to.equal(0);
+    //expect(scope_0_init_digest.counter).to.equal(0);
 
     // invoke $digest counter === 1
-    // scope.$digest();
-    // expect(scope.counter).to.equal(1);
+    // scope_0_init_digest.$digest();
+    // expect(scope_0_init_digest.counter).to.equal(1);
 
     // invoke $digest but someValue not changed $digest counter === 1
-    //  scope.$digest();
-    // expect(scope.counter).to.equal(1);
+    //  scope_0_init_digest.$digest();
+    // expect(scope_0_init_digest.counter).to.equal(1);
 
     // change the someValue
-    // scope.someValue = 'b';
+    // scope_0_init_digest.someValue = 'b';
     // // no invoke the $digest counter === 1
-    //expect(scope.counter).to.equal(1);
+    //expect(scope_0_init_digest.counter).to.equal(1);
 
 
-    // scope.$digest();
+    // scope_0_init_digest.$digest();
     //  invoke the $digest counter === 2
-    //  expect(scope.counter).to.equal(2);
+    //  expect(scope_0_init_digest.counter).to.equal(2);
 
   });
 
@@ -75,8 +75,8 @@ describe("$Scope", function () {
     // var watchFn = function(){
     //   return "huahuadavids"
     // }
-    // scope.$watch(watchFn);
-    // scope.$digest();
+    // scope_0_init_digest.$watch(watchFn);
+    // scope_0_init_digest.$digest();
 
   });
 
@@ -84,7 +84,7 @@ describe("$Scope", function () {
   it("triggers chained watchers in the same digest", function () {
     /**
      * @description
-     * scope = new Scope()
+     * scope_0_init_digest = new Scope()
      * // $$watcher as array in this;
      */
     scope.name = 'Jane';
@@ -127,14 +127,14 @@ describe("$Scope", function () {
      *    last: 'Jane'
      * }
      * dirty = true;
-     * scope.nameUpper = 'JANE'
+     * scope_0_init_digest.nameUpper = 'JANE'
      *
      *  loop 2
      *  watch1
      *  {
      *    last: 'JANE'
      *  }
-     *  scope.initial = J.
+     *  scope_0_init_digest.initial = J.
      *  dirty = true;
      *
      *   dirty = undefined;
@@ -145,14 +145,14 @@ describe("$Scope", function () {
      */
 
 
-    // the scope has 2 watcher in array-list
+    // the scope_0_init_digest has 2 watcher in array-list
     scope.$digest();
     // invoke the $digest
     // iterate the list
 
     /**
      * for the watcher1
-     * newValue = watchFn = scope.nameUpper = undefined;
+     * newValue = watchFn = scope_0_init_digest.nameUpper = undefined;
      * oldValue = watcher1.last = initFn;
      * newValue not equal newValue
      * watcher1.last = undefined

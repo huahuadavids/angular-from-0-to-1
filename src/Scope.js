@@ -14,7 +14,7 @@ var _ = require("lodash");
 var noop = function(){}
 
 /**
- * $scope 是继承于一个构造函数
+ * $scope_0_init_digest 是继承于一个构造函数
  * 内部维护一个watchers数组
  */
 function Scope(){
@@ -27,6 +27,8 @@ function Scope(){
   // digest loop if have a dirty watcher just return it ,stop the $digest
   this.$$lastDirtyWatch = null;
 
+  // here to store the scheduled $evalAsync jobs
+  this.$$asyncQueue = [];
 }
 
 // initialize the last value , because a function (a reference value) not equal to others except it self
@@ -41,7 +43,7 @@ Scope.prototype.$watch = function(watchFn, listenerFn, valueEq) {
     // if the listenerFn is undefined we should pass a noop function
     listenerFn: listenerFn || noop,
 
-    // if not init this value ,this is undefined , when the scope variety is not defined
+    // if not init this value ,this is undefined , when the scope_0_init_digest variety is not defined
     // in the $digest , (newValue !== oldValue) is ( undefined !== undefined ) is false
     // then never change the value
     // no matter what the watchFn return , the listener will invoked
@@ -92,6 +94,7 @@ Scope.prototype.$$digestOnce = function() {
 
 /**
  * @name $$areEqual
+ * @Test test/scope_0_init_digest/scope5.spec.js
  * @description compare two args by value or by reference
  * @param newValue
  * @param oldValue
@@ -115,6 +118,10 @@ Scope.prototype.$digest = function() {
   var dirty;
   this.$$lastDirtyWatch = null;
   do {
+    while (this.$$asyncQueue.length) {
+      var asyncTask = this.$$asyncQueue.shift();
+      asyncTask.scope.$eval(asyncTask.expression);
+    }
     dirty = this.$$digestOnce();
     if (dirty && !(ttl--)) {
       throw "10 digest iterations reached";
@@ -125,18 +132,40 @@ Scope.prototype.$digest = function() {
 
 /**
  * @name $eval
- * @Test test/scope/scope6.spec.js
+ * @Test test/scope_0_init_digest/scope6.spec.js
  * @type function
- * @description execute some code in the context of a scope
+ * @description execute some code in the context of a scope_0_init_digest ,
+ * It takes a function as an argument and immediately executes
+ * that function giving it the scope_0_init_digest itself as an argument
  * @param fn
  * @param args
  * @returns fn
  */
+
 Scope.prototype.$eval = function(fn, args) {
   return fn(this, args);
 };
 
 
+Scope.prototype.$evalAsync = function(expr) {
+  // The reason we explicitly store the current scope in the queued object is related to scope inheritance
+  this.$$asyncQueue.push({scope: this, expression: expr});
+};
 
+
+
+/**
+ * @description  Integrating External Code With The Digest Cycle
+ * @Test test/scope_0_init_digest/scope7.spec.js
+ * @param expr
+ * @returns {fn}
+ */
+Scope.prototype.$apply = function(expr) {
+  try {
+    return this.$eval(expr);
+  } finally {
+    this.$digest();
+  }
+};
 
 module.exports = Scope;
