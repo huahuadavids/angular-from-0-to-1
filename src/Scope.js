@@ -130,17 +130,6 @@ Scope.prototype.$digest = function() {
 };
 
 
-/**
- * @name $eval
- * @Test test/scope_0_init_digest/scope6.spec.js
- * @type function
- * @description execute some code in the context of a scope_0_init_digest ,
- * It takes a function as an argument and immediately executes
- * that function giving it the scope_0_init_digest itself as an argument
- * @param fn
- * @param args
- * @returns fn
- */
 
 Scope.prototype.$eval = function(fn, args) {
   return fn(this, args);
@@ -151,8 +140,6 @@ Scope.prototype.$evalAsync = function(expr) {
   // The reason we explicitly store the current scope in the queued object is related to scope inheritance
   this.$$asyncQueue.push({scope: this, expression: expr});
 };
-
-
 
 /**
  * @description  Integrating External Code With The Digest Cycle
@@ -169,3 +156,4 @@ Scope.prototype.$apply = function(expr) {
 };
 
 module.exports = Scope;
+
