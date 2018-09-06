@@ -123,10 +123,11 @@ Scope.prototype.$digest = function() {
       asyncTask.scope.$eval(asyncTask.expression);
     }
     dirty = this.$$digestOnce();
-    if (dirty && !(ttl--)) {
+    // this.$$asyncQueue.length added because if the watch is not dirty but still exists events in $$asyncQueue
+    if ((dirty || this.$$asyncQueue.length) && !(ttl--)) {
       throw "10 digest iterations reached";
     }
-  } while (dirty);
+  } while (dirty  || this.$$asyncQueue.length);
 };
 
 
@@ -135,7 +136,7 @@ Scope.prototype.$eval = function(fn, args) {
   return fn(this, args);
 };
 
-
+// the async implementation of $eval 
 Scope.prototype.$evalAsync = function(expr) {
   // The reason we explicitly store the current scope in the queued object is related to scope inheritance
   this.$$asyncQueue.push({scope: this, expression: expr});
