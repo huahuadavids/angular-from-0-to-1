@@ -11,13 +11,13 @@
 
 
 var _ = require("lodash");
-var noop = function(){}
+var noop = function () { }
 
 /**
  * $scope_0_init_digest 是继承于一个构造函数
  * 内部维护一个watchers数组
  */
-function Scope(){
+function Scope() {
 
   // $$ is private
   // store all the registered watchers
@@ -29,12 +29,15 @@ function Scope(){
 
   // here to store the scheduled $evalAsync jobs
   this.$$asyncQueue = [];
+
+  //used  for $evalAsync to check whether a $digest is already ongoing 
+  this.$$phase = null
 }
 
 // initialize the last value , because a function (a reference value) not equal to others except it self
 function initWatchVal() { }
 
-Scope.prototype.$watch = function(watchFn, listenerFn, valueEq) {
+Scope.prototype.$watch = function (watchFn, listenerFn, valueEq) {
   var watcher = {
     // if this function return nothing
     // that will in $digest undefined !== last
@@ -66,11 +69,11 @@ Scope.prototype.$watch = function(watchFn, listenerFn, valueEq) {
 //  when the data change invoke the listenerFn，this called (dirty-checking)
 //  when invoked $digest，all the watch will be invoked
 //  controls the amounts of watcher , is a optimize method
-Scope.prototype.$$digestOnce = function() {
+Scope.prototype.$$digestOnce = function () {
   var self = this;
   var newValue, oldValue, dirty;
 
-  _.forEach(this.$$watchers, function(watcher) {
+  _.forEach(this.$$watchers, function (watcher) {
 
     // get the oldValue and the newValue
     newValue = watcher.watchFn(self);
@@ -81,7 +84,7 @@ Scope.prototype.$$digestOnce = function() {
       self.$$lastDirtyWatch = watcher;
 
       // if use the deep compare , then deepClone the value
-      watcher.last =  (watcher.valueEq ? _.cloneDeep(newValue) : newValue);;
+      watcher.last = (watcher.valueEq ? _.cloneDeep(newValue) : newValue);;
       watcher.listenerFn(newValue, (oldValue === initWatchVal ? newValue : oldValue), self);
       dirty = true;
     } else if (self.$$lastDirtyWatch === watcher) {
@@ -101,7 +104,7 @@ Scope.prototype.$$digestOnce = function() {
  * @param valueEq
  * @returns {boolean}
  */
-Scope.prototype.$$areEqual = function(newValue, oldValue, valueEq) {
+Scope.prototype.$$areEqual = function (newValue, oldValue, valueEq) {
   if (valueEq) {
     return _.isEqual(newValue, oldValue);
   } else {
@@ -113,10 +116,11 @@ Scope.prototype.$$areEqual = function(newValue, oldValue, valueEq) {
 
 
 
-Scope.prototype.$digest = function() {
+Scope.prototype.$digest = function () {
   var ttl = 10;  // This maximum amount of iterations is called the TTL (short for “Time To Live”)
   var dirty;
   this.$$lastDirtyWatch = null;
+  this.$beginPhase("$digest");
   do {
     while (this.$$asyncQueue.length) {
       var asyncTask = this.$$asyncQueue.shift();
@@ -125,21 +129,30 @@ Scope.prototype.$digest = function() {
     dirty = this.$$digestOnce();
     // this.$$asyncQueue.length added because if the watch is not dirty but still exists events in $$asyncQueue
     if ((dirty || this.$$asyncQueue.length) && !(ttl--)) {
+      this.$clearPhase();
       throw "10 digest iterations reached";
     }
-  } while (dirty  || this.$$asyncQueue.length);
+  } while (dirty || this.$$asyncQueue.length);
 };
 
 
 
-Scope.prototype.$eval = function(fn, args) {
+Scope.prototype.$eval = function (fn, args) {
   return fn(this, args);
 };
 
 // the async implementation of $eval 
-Scope.prototype.$evalAsync = function(expr) {
-  // The reason we explicitly store the current scope in the queued object is related to scope inheritance
-  this.$$asyncQueue.push({scope: this, expression: expr});
+Scope.prototype.$evalAsync = function (expr) {
+  var self = this;
+  if (!self.$$phase && !self.$$asyncQueue.length) {
+    setTimeout(function () {
+      if (self.$$asyncQueue.length) {
+        self.$digest();
+      }
+    }, 0);
+  }
+  //  // The reason we explicitly store the current scope in the queued object is related to scope inheritance
+  self.$$asyncQueue.push({ scope: self, expression: expr });
 };
 
 /**
@@ -148,12 +161,27 @@ Scope.prototype.$evalAsync = function(expr) {
  * @param expr
  * @returns {fn}
  */
-Scope.prototype.$apply = function(expr) {
+Scope.prototype.$apply = function (expr) {
   try {
+    this.$beginPhase("$apply");
     return this.$eval(expr);
   } finally {
+    this.$clearPhase()
     this.$digest();
   }
+};
+
+/**
+ * @controls phases 
+ */
+Scope.prototype.$beginPhase = function (phase) {
+  if (this.$$phase) {
+    throw this.$$phase + ' already in progress.';
+  }
+  this.$$phase = phase;
+};
+Scope.prototype.$clearPhase = function () {
+  this.$$phase = null;
 };
 
 module.exports = Scope;
